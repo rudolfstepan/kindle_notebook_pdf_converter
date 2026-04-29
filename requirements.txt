@@ -1,0 +1,18 @@
+# Kindle Scribe Notebook PDF Converter - Dependencies
+# Install with: pip install -r requirements.txt
+
+# PDF generation and vector rendering
+reportlab>=4.0.0
+
+# PDF handling (required by kfxlib)
+pypdf>=3.0.0
+
+# XML processing (required by kfxlib)
+lxml>=4.9.0
+
+# Image processing (required by kfxlib)
+Pillow>=9.0.0
+
+# Note: kfxlib is not available on PyPI and must be extracted from the
+# Calibre "KFX Input" plugin and placed in the kfx_plugin/ directory.
+# See README.md for installation instructions.
