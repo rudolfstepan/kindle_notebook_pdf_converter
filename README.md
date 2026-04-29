@@ -2,6 +2,12 @@
 
 Converts handwritten notes from Kindle Scribe (`.nbk` files) to PDFs with full vector rendering of strokes.
 
+## Supported input
+
+This tool is intended for Kindle Scribe `.nbk` notebook files exported from a Kindle device.
+
+Other Kindle formats such as `.kfx`, `.azw`, or DRM-protected ebook files are not supported.
+
 ## Features
 
 - ✅ Converts Kindle Scribe notebook files (.nbk) to high-quality PDFs
