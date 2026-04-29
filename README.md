@@ -312,4 +312,8 @@ print(f"{stats['n_pages']} pages, {stats['n_strokes']} strokes")
 
 ---
 
+## Disclaimer
+
+This project is not affiliated with Amazon or Kindle. Kindle and Kindle Scribe are trademarks of Amazon.
+
 **Last updated:** April 2026
