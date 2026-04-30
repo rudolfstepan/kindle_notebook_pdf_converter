@@ -30,7 +30,7 @@ Other Kindle formats such as `.kfx`, `.azw`, or DRM-protected ebook files are no
 
 ```bash
 git clone <repository-url>
-cd downloader
+cd kindle_notebook_pdf_converter
 ```
 
 ### 2. Create Python Virtual Environment
@@ -47,6 +47,31 @@ source .venv/bin/activate
 
 ### 3. Install Dependencies
 
+Recommended: use `setup.py`. It now performs all required setup steps automatically:
+
+- installs the Python runtime dependencies
+- downloads the `kfxlib` plugin from the GitHub mirror
+- extracts `kfxlib` into `kfx_plugin/`
+- registers `kfx_plugin/` so `import kfxlib` works immediately
+
+```bash
+# Windows
+py setup.py
+
+# macOS/Linux
+python3 setup.py
+```
+
+This installs these Python packages automatically:
+
+- `reportlab`
+- `pypdf`
+- `lxml`
+- `Pillow`
+- `beautifulsoup4`
+
+Alternative manual installation:
+
 ```bash
 pip install --upgrade pip
 pip install -r requirements.txt
@@ -59,18 +84,29 @@ pip install reportlab>=4.0.0
 pip install pypdf>=3.0.0
 pip install lxml>=4.9.0
 pip install Pillow>=9.0.0
+pip install beautifulsoup4>=4.12.0
 ```
 
-### 4. Prepare KFX Plugin
+### 4. KFX Plugin (`kfxlib`)
 
-The project requires the `kfxlib` library from John Howell's **Calibre KFX Input Plugin**:
+The project requires the `kfxlib` library from John Howell's KFX Input plugin.
 
-1. Download the [KFX Input Plugin](https://www.mobileread.com/forums/showthread.php?t=272713)
+`setup.py` now downloads it automatically from the public GitHub mirror:
+
+- `https://github.com/kluyg/calibre-kfx-input`
+
+The downloaded archive is unpacked automatically and only the `kfxlib/` folder is extracted into `kfx_plugin/`.
+
+Manual setup is only needed if the automatic download fails.
+
+#### Manual fallback
+
+1. Clone or download `https://github.com/kluyg/calibre-kfx-input`
 2. Extract the ZIP file
 3. Navigate to the directory containing `kfxlib/`
 4. Copy the `kfxlib` folder to the `kfx_plugin/` directory:
    ```
-   downloader/
+    kindle_notebook_pdf_converter/
    ├── kfx_plugin/
    │   └── kfxlib/          <- copy here
    │       ├── __init__.py
@@ -92,7 +128,7 @@ export KFX_PLUGIN_DIR="/path/to/kfx_plugin"
 ### GUI Mode (recommended for beginners)
 
 ```bash
-python kindle_notebook_pdf_converter/nbk_convert.py --gui
+python nbk_convert.py --gui
 ```
 
 The GUI provides:
@@ -107,7 +143,6 @@ The GUI provides:
 #### Convert single file
 
 ```bash
-cd kindle_notebook_pdf_converter
 python nbk_convert.py <path-to-nbk-or-directory> [output.pdf]
 ```
 
@@ -128,7 +163,7 @@ python nbk_convert.py /path/to/notebooks/notebook-dir/
 python nbk_convert.py /path/to/notebooks --batch
 
 # With separate output directory
-python nbk_convert.py /path/to/notebooks --batch --output /path/to/output
+python nbk_convert.py /path/to/notebooks --batch /path/to/output
 
 # Skip existing PDFs
 python nbk_convert.py /path/to/notebooks --batch --skip-existing
@@ -179,7 +214,7 @@ python nbk_convert.py --gui
 ### Manual MTP Sync
 
 ```python
-from kindle_notebook_pdf_converter.nbk_convert import sync_kindle_notebooks_via_mtp
+from nbk_convert import sync_kindle_notebooks_via_mtp
 
 # Copy notebooks from Kindle to local disk
 local_root, copied = sync_kindle_notebooks_via_mtp(
@@ -197,24 +232,18 @@ print(f"Copied {copied} files to {local_root}")
 ## Directory Structure
 
 ```
-downloader/
+kindle_notebook_pdf_converter/
 ├── README.md                          <- This file
+├── setup.py                           <- Installs Python deps and kfxlib
+├── pyproject.toml                     <- Project metadata
 ├── requirements.txt                   <- Python dependencies
 ├── .venv/                             <- Virtual environment
 ├── kfx_plugin/
-│   └── kfxlib/                        <- KFX Plugin (external)
-├── kindle_notebook_pdf_converter/
-│   ├── nbk_convert.py                 <- Main script
-│   ├── nbk_convert.py                 
-│   ├── kindle_mtp_cache/              <- MTP sync cache
-│   └── notebooks/                     <- Sample notebooks
+│   └── kfxlib/                        <- Auto-downloaded KFX plugin
+├── nbk_convert.py                     <- Main converter / GUI entry point
 ├── kindle_mtp_cache/                  <- MTP sync output
-├── kfx_plugin/                        <- KFX Plugin
 ├── notebooks/                         <- Local notebook collection
-└── [other tools]
-    ├── video_link_scanner.py
-    ├── convert_nbk_to_pdf.py
-    └── kindle_scribe_calibre_import.py
+└── docs/                              <- Additional documentation
 ```
 
 ## Output
@@ -238,6 +267,7 @@ Generated PDFs contain:
 | **pypdf**     | ≥3.0.0  | PDF handling (required by kfxlib)         |
 | **lxml**      | ≥4.9.0  | XML processing (required by kfxlib)       |
 | **Pillow**    | ≥9.0.0  | Image processing (required by kfxlib)     |
+| **beautifulsoup4** | ≥4.12.0 | HTML/XML parsing used by kfxlib      |
 | **kfxlib**    | local   | Kindle format decoding (GPL v3)            |
 
 ## Troubleshooting
@@ -249,12 +279,21 @@ ImportError: No module named 'kfxlib'
 ```
 
 **Solution:**
+- Run `py setup.py` again to trigger automatic download and registration
 - Verify that `kfxlib/` exists in `kfx_plugin/`
 - Or set `KFX_PLUGIN_DIR`:
   ```bash
   export KFX_PLUGIN_DIR="/path/to/kfx_plugin"
   python nbk_convert.py ...
   ```
+
+### "BeautifulSoup module is missing"
+
+This means `beautifulsoup4` is missing from the active Python environment.
+
+**Solution:**
+- Re-run `py setup.py`
+- Or install manually with `pip install beautifulsoup4>=4.12.0`
 
 ### "nbk file not found"
 
@@ -305,7 +344,7 @@ RuntimeError: MTP device 'Kindle Scribe' not found
 See docstrings in `nbk_convert.py` for API details:
 
 ```python
-from kindle_notebook_pdf_converter.nbk_convert import convert, extract_pages
+from nbk_convert import convert, extract_pages
 
 # Programmatic conversion
 stats = convert(

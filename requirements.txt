@@ -13,6 +13,9 @@ lxml>=4.9.0
 # Image processing (required by kfxlib)
 Pillow>=9.0.0
 
+# HTML/XML parsing used by kfxlib
+beautifulsoup4>=4.12.0
+
 # Note: kfxlib is not available on PyPI and must be extracted from the
 # Calibre "KFX Input" plugin and placed in the kfx_plugin/ directory.
 # See README.md for installation instructions.
